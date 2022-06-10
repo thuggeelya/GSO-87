@@ -21,7 +21,7 @@ public class MyRunnableTest {
             Thread.sleep(1000);
             secondThread.interrupt();
         } catch (InterruptedException e) {
-            for (int i = 0; i < 50; i++) {
+            while (scanner.hasNext()){
                 assertNotEquals(scanner.nextLine(), scanner.nextLine());
             }
         }
