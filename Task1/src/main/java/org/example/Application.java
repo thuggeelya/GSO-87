@@ -7,6 +7,7 @@ public class Application {
         System.out.println(appThread.getState());
         Object lock = appThread.getLock();
         appThread.start();
+        System.out.println(appThread.getState());
 
         synchronized (lock) {
             lock.wait();

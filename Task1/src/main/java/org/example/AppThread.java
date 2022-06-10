@@ -4,14 +4,16 @@ public class AppThread extends Thread {
 
     private final Object lock = 0;
 
+    public AppThread() {
+        setName("Task 1 Thread");
+    }
+
     public Object getLock() {
         return lock;
     }
 
     @Override
     public void run() {
-        System.out.println(getState());
-
         synchronized (lock) {
             try {
                 lock.notify();
