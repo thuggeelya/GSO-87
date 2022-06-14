@@ -5,16 +5,12 @@ import java.util.List;
 
 public class AppThread extends Thread {
 
-    private final Object lock = new Object();
     private final List<Thread.State> stateList = new ArrayList<>(6);
 
     public AppThread() {
         setName("Task 1 Thread");
     }
 
-    public Object getLock() {
-        return lock;
-    }
 
     public List<State> getStateList() {
         return stateList;
@@ -32,13 +28,13 @@ public class AppThread extends Thread {
 
     @Override
     public void run() {
-        synchronized (lock) {
+        synchronized (this) {
             try {
-                lock.notify();
-                lock.wait();
+                this.notify();
+                this.wait();
                 Thread.sleep(80);
-                lock.notify();
-                lock.wait(80);
+                this.notify();
+                this.wait(80);
             } catch (InterruptedException e) {
                 System.out.println(getName() + " was interrupted");
             }

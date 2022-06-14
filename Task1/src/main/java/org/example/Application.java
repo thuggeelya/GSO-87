@@ -5,16 +5,15 @@ public class Application {
     public static void main(String[] args) throws InterruptedException {
         AppThread appThread = new AppThread();
         appThread.printState();
-        Object lock = appThread.getLock();
 
-        synchronized (lock) {
+        synchronized (appThread) {
             appThread.start();
             appThread.printState();
-            lock.wait();
+            appThread.wait();
             appThread.printState();
-            lock.notify();
+            appThread.notify();
             appThread.printState();
-            lock.wait();
+            appThread.wait();
             Thread.sleep(40);
             appThread.printState();
         }
