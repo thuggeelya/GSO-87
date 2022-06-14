@@ -19,7 +19,9 @@ public class MessagesTest {
         MessagesContainer containerFor5And7 = new MessagesContainer();
         containerFor5And7.addMessage(firstMessage);
         containerFor5And7.addMessage(secondMessage);
-        new Session().startSession(firstMessage, secondMessage);
+        new ThreadCounter(1);
+        new ThreadMessage(5, firstMessage);
+        new ThreadMessage(7, secondMessage);
 
         while (MESSAGES_MAP.size() < 110) {
             try {
