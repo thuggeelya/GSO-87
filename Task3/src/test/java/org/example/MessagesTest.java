@@ -21,7 +21,7 @@ public class MessagesTest {
         containerFor5And7.addMessage(secondMessage);
         new Session().startSession(firstMessage, secondMessage);
 
-        while (MESSAGES_MAP.size() < 11) {
+        while (MESSAGES_MAP.size() < 110) {
             try {
                 //noinspection BusyWait
                 Thread.sleep(500);

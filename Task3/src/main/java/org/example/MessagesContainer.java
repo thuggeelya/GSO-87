@@ -2,6 +2,7 @@ package org.example;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +11,7 @@ import java.util.Objects;
 
 @NoArgsConstructor
 @Getter
+@ToString
 public final class MessagesContainer {
 
     private final List<String> messageList = new ArrayList<>(2);
@@ -30,12 +32,5 @@ public final class MessagesContainer {
     @Override
     public int hashCode() {
         return Objects.hash(getClass());
-    }
-
-    @Override
-    public String toString() {
-        return "MessagesContainer{" +
-                "messageList=" + messageList +
-                '}';
     }
 }
