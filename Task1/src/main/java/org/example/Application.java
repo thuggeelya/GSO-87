@@ -4,22 +4,22 @@ public class Application {
 
     public static void main(String[] args) throws InterruptedException {
         AppThread appThread = new AppThread();
-        System.out.println(appThread.getState());
+        appThread.printState();
         Object lock = appThread.getLock();
-        appThread.start();
-        System.out.println(appThread.getState());
 
         synchronized (lock) {
+            appThread.start();
+            appThread.printState();
             lock.wait();
-            System.out.println(appThread.getState());
+            appThread.printState();
             lock.notify();
-            System.out.println(appThread.getState());
+            appThread.printState();
             lock.wait();
-            Thread.sleep(100);
-            System.out.println(appThread.getState());
+            Thread.sleep(40);
+            appThread.printState();
         }
 
         appThread.join();
-        System.out.println(appThread.getState());
+        appThread.printState();
     }
 }
