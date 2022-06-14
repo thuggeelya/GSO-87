@@ -1,6 +1,5 @@
 package org.example;
 
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
@@ -10,7 +9,6 @@ import java.util.List;
 import java.util.Objects;
 
 @NoArgsConstructor
-@Getter
 @ToString
 public final class MessagesContainer {
 
