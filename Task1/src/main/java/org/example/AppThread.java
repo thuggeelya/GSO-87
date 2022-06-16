@@ -11,13 +11,8 @@ public class AppThread extends Thread {
         setName("Task 1 Thread");
     }
 
-
     public List<State> getStateList() {
         return stateList;
-    }
-
-    public void clearStateList() {
-        stateList.clear();
     }
 
     public void printState() {
@@ -31,10 +26,14 @@ public class AppThread extends Thread {
         synchronized (this) {
             try {
                 this.notify();
+                System.out.println(getName() + " notify()ed in run()");
+                System.out.println(getName() + " is wait()ing in run()");
                 this.wait();
-                Thread.sleep(80);
                 this.notify();
+                System.out.println(getName() + " notify()ed in run()");
+                System.out.println(getName() + " is wait(80)ing in run()");
                 this.wait(80);
+                System.out.println(getName() + " wait(80)ed in run()");
             } catch (InterruptedException e) {
                 System.out.println(getName() + " was interrupted");
             }

@@ -20,26 +20,24 @@ public class AppThreadTest {
         stateList.add(TIMED_WAITING);
         stateList.add(TERMINATED);
 
-        for (int i = 0; i < 2000; i++) {
+        for (int i = 0; i < 200; i++) {
             tryOutMultipleState(stateList);
         }
     }
 
     private void tryOutMultipleState(List<Thread.State> stateList) throws InterruptedException {
         AppThread appThread = new AppThread();
-        Object lock = appThread.getLock();
-        appThread.clearStateList();
         appThread.printState();
 
-        synchronized (lock) {
+        synchronized (appThread) {
             appThread.start();
             appThread.printState();
-            lock.wait();
+            appThread.wait();
             appThread.printState();
-            lock.notify();
+            appThread.notify();
             appThread.printState();
-            lock.wait();
-            Thread.sleep(40);
+            appThread.wait();
+//            Thread.sleep(40);
             appThread.printState();
         }
 

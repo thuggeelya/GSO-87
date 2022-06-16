@@ -9,13 +9,16 @@ public class Application {
         synchronized (appThread) {
             appThread.start();
             appThread.printState();
+            System.out.println(appThread.getName() + " is wait()ing in main");
             appThread.wait();
             appThread.printState();
             appThread.notify();
+            System.out.println(appThread.getName() + " notify()ed in main");
             appThread.printState();
+            System.out.println(appThread.getName() + " is wait()ing in main");
             appThread.wait();
-            Thread.sleep(40);
             appThread.printState();
+            System.out.println(appThread.getName() + " wait()ed in main");
         }
 
         appThread.join();
