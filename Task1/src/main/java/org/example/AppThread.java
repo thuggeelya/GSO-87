@@ -26,16 +26,16 @@ public class AppThread extends Thread {
         synchronized (this) {
             try {
                 this.notify();
-                System.out.println(getName() + " notify()ed in run()");
-                System.out.println(getName() + " is wait()ing in run()");
+                System.out.println(getName() + " run: notify()ed in run()");
+                System.out.println(getName() + " run: is wait()ing in run()");
                 this.wait();
                 this.notify();
-                System.out.println(getName() + " notify()ed in run()");
-                System.out.println(getName() + " is wait(80)ing in run()");
+                System.out.println(getName() + " run: notify()ed in run()");
+                System.out.println(getName() + " run: is wait(80)ing in run()");
                 this.wait(80);
-                System.out.println(getName() + " wait(80)ed in run()");
+                System.out.println(getName() + " run: wait(80)ed in run()");
             } catch (InterruptedException e) {
-                System.out.println(getName() + " was interrupted");
+                System.out.println(getName() + " run: was interrupted");
             }
         }
     }

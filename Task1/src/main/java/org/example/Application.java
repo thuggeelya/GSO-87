@@ -1,9 +1,9 @@
 package org.example;
 
 public class Application {
+    static final AppThread appThread = new AppThread();
 
     public static void main(String[] args) throws InterruptedException {
-        AppThread appThread = new AppThread();
         appThread.printState();
 
         synchronized (appThread) {
