@@ -1,38 +1,32 @@
 package org.example;
 
-import java.util.Arrays;
+import lombok.Getter;
+
 import java.util.logging.Logger;
 
-/**
- * producer class
- */
 public class ParkingLot implements Runnable {
 
-    private final Boolean[] parkingQueue;
-    private final int capacity;
+    @Getter
+    private final boolean[] parkingQueue;
 
-    public ParkingLot(Boolean[] parkingQueue, int capacity) {
-        this.parkingQueue = parkingQueue;
-        this.capacity = capacity;
+    public ParkingLot(int capacity) {
+        this.parkingQueue = new boolean[capacity];
+
+        for (int i = 0; i < capacity; i++) {
+            parkingQueue[i] = false;
+        }
     }
 
     @Override
     public void run() {
+//        long currentTime = LocalTime
+
+        //noinspection InfiniteLoopStatement
         while (true) {
             try {
+                //noinspection BusyWait
+                Thread.sleep(500);
                 synchronized (parkingQueue) {
-                    if (Arrays.stream(parkingQueue).noneMatch(b -> b)) {
-                        parkingQueue.wait();
-                    }
-
-                    for (int i = 0; i < parkingQueue.length; i++) {
-                        if (!parkingQueue[i]) {
-                            parkingQueue[i] = true;
-                            break;
-                        }
-                    }
-
-                    Thread.sleep((long) (Math.floor(Math.random() * 8000) + 2000));
                     parkingQueue.notify();
                 }
             } catch (InterruptedException e) {
