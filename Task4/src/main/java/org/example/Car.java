@@ -1,7 +1,5 @@
 package org.example;
 
-import lombok.SneakyThrows;
-
 public class Car extends Thread {
 
     /**
@@ -12,8 +10,11 @@ public class Car extends Thread {
     private final Boolean[] parkingQueue;
     private final ParkingLot parkingLot;
 
-    @SneakyThrows(NullPointerException.class)
     public Car(ParkingLot parkingLot) {
+        if (parkingLot == null) {
+            throw new IllegalArgumentException("Null parking lot");
+        }
+
         this.parkingLot = parkingLot;
         this.parkingQueue = parkingLot.getParkingQueue();
         setName(getName().replace("Thread", "Car"));

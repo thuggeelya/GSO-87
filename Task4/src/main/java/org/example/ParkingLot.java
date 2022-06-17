@@ -2,7 +2,6 @@ package org.example;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 
 import java.util.Arrays;
 
@@ -46,8 +45,11 @@ public class ParkingLot extends Thread {
         System.out.println("closing parking lot\n-------------------");
     }
 
-    @SneakyThrows(NullPointerException.class)
     public int parkCar(Car car) {
+        if (car == null) {
+            throw new IllegalArgumentException("Cannot park the null car");
+        }
+
         for (int i = 0; i < parkingQueue.length; i++) {
             if (!parkingQueue[i]) {
                 parkingQueue[i] = true;
