@@ -2,17 +2,24 @@ package org.example;
 
 import lombok.SneakyThrows;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class Application {
 
-    @SneakyThrows(value = InterruptedException.class)
+    @SneakyThrows(InterruptedException.class)
     public static void main(String[] args) {
         int capacity = 5;
-        ParkingLot parkingLot = new ParkingLot(capacity);
-        new Thread(parkingLot, "Parking lot").start();
+        int carsCount = 17;
+        ExecutorService cars = Executors.newFixedThreadPool(carsCount);
+        ParkingLot parkingLot = new ParkingLot(capacity, carsCount);
+        parkingLot.start();
 
-        for (int i = 0; i < 20; i++) {
-            new Thread(new Car(parkingLot.getParkingQueue()), "Car-" + i).start();
+        for (int i = 0; i < carsCount; i++) {
+            cars.submit(new Car(parkingLot));
             Thread.sleep(500);
         }
+
+        cars.shutdown();
     }
 }

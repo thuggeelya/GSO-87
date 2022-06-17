@@ -1,56 +1,59 @@
 package org.example;
 
-import java.util.logging.Logger;
+import lombok.SneakyThrows;
 
-public class Car implements Runnable {
+public class Car extends Thread {
 
-    private final boolean[] parkingQueue;
+    /**
+     * Particular car parks at the {@link ParkingLot} the certain value of times and then stops doing it.
+     */
+    public static final long MAX_ATTEMPTS_TO_PARK = 5;
 
-    public Car(boolean[] parkingQueue) {
-        this.parkingQueue = parkingQueue;
+    private final Boolean[] parkingQueue;
+    private final ParkingLot parkingLot;
+
+    @SneakyThrows(NullPointerException.class)
+    public Car(ParkingLot parkingLot) {
+        this.parkingLot = parkingLot;
+        this.parkingQueue = parkingLot.getParkingQueue();
+        setName(getName().replace("Thread", "Car"));
     }
 
     @Override
     public void run() {
-        int parkingSpaceNumber;
+        long maxDelay = 8000;
+        long minDelay = 2000;
+        long attempts = 0;
         long delay;
+        int parkingSpaceNumber;
 
-        //noinspection InfiniteLoopStatement
-        while (true) {
+        while (attempts < MAX_ATTEMPTS_TO_PARK) {
             try {
                 synchronized (parkingQueue) {
                     parkingQueue.wait();
-                    parkingSpaceNumber = parkAndGetParkingSpaceNumber();
+                    parkingSpaceNumber = parkingLot.parkCar(this);
                 }
 
-                if (parkingSpaceNumber != -1) {
-                    delay = (long) (Math.floor(Math.random() * 6000) + 2000);
-                    //noinspection BusyWait
-                    Thread.sleep(delay);
-
-                    synchronized (parkingQueue) {
-                        parkingQueue[parkingSpaceNumber] = false;
-//                    parkingQueue.notify();
-                    }
-
-                    System.out.println("Car has gone from " + parkingSpaceNumber + " after " + (double) delay / 1000 + " sec");
-                }
+                delay = (long) (Math.floor(Math.random() * (maxDelay - minDelay)) + minDelay);
+                Thread.sleep(delay);
+                leaveParkingSpaceAfterDelay(parkingSpaceNumber, delay);
+                attempts++;
             } catch (InterruptedException e) {
-                Logger.getGlobal().severe("Error: " + e);
+                throw new RuntimeException();
             }
         }
+
+        System.out.println("-----------\n" + getName() + " left\n-----------");
     }
 
-    private int parkAndGetParkingSpaceNumber() throws InterruptedException {
-        for (int i = 0; i < parkingQueue.length; i++) {
-            if (!parkingQueue[i]) {
-                parkingQueue[i] = true;
-                System.out.println("Car is parking at " + i);
-                return i;
+    public void leaveParkingSpaceAfterDelay(int parkingSpaceNumber, long delay) {
+        synchronized (parkingQueue) {
+            if (!parkingQueue[parkingSpaceNumber]) {
+                throw new ArrayIndexOutOfBoundsException(getName() + " cannot leave the " + parkingSpaceNumber + " space cause it's already empty");
             }
-        }
 
-        System.out.println("No vacant places");
-        return -1;
+            parkingQueue[parkingSpaceNumber] = false;
+            System.out.println("<- " + getName() + " has gone from " + parkingSpaceNumber + " after " + (double) delay / 1000 + " sec");
+        }
     }
 }
