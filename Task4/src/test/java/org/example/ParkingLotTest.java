@@ -37,8 +37,8 @@ public class ParkingLotTest {
 
     @Test
     public void checkNoLeavingEmptyParkingLot() throws InterruptedException {
-        int capacity = 3;
-        int carsCount = 3;
+        int capacity = 30;
+        int carsCount = 300;
         ParkingLot parkingLot = openCloseAndGetParkingLot(capacity, carsCount);
         assertFalse("Parking lot is not empty", Arrays.stream(parkingLot.getParkingQueue()).anyMatch(b -> b));
 

@@ -13,6 +13,7 @@
       <module>Task2</module>
       <module>Task3</module>
       <module>Task4</module>
+      <module>Task5</module>
   </modules>
 
   <name>Multithreading</name>
