@@ -13,7 +13,7 @@ public class Ferry extends Thread {
     @Override
     public void run() {
         try {
-            int currentSize = 0;
+            byte currentSize = 0;
 
             while (true) {
                 synchronized (sharedQueue) {
