@@ -1,23 +1,26 @@
 package org.example;
 
+import java.util.Queue;
+
 public class Car extends Thread {
 
-    private final Ferry ferry;
+    private final Queue<Car> sharedQueue;
 
-    public Car(Ferry ferry) {
-        this.ferry = ferry;
+    public Car(Queue<Car> sharedQueue) {
+        this.sharedQueue = sharedQueue;
         setName(getName().replace("Thread", "Car"));
     }
 
     @Override
     public void run() {
         try {
-            sleep(400);
-            ferry.acquire();
+            synchronized (sharedQueue) {
+                while (sharedQueue.size() >= 3) {
+                    sharedQueue.wait();
+                }
 
-            synchronized (ferry) {
-                System.out.println(getName() + ".. ");
-                ferry.wait();
+                sharedQueue.add(this);
+                sharedQueue.notify();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

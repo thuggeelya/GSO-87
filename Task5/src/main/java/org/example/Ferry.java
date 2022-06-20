@@ -1,40 +1,38 @@
 package org.example;
 
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicInteger;
+import lombok.AllArgsConstructor;
 
+import java.util.Objects;
+import java.util.Queue;
+
+@AllArgsConstructor
 public class Ferry extends Thread {
 
-    private final AtomicInteger carCount = new AtomicInteger(0);
-    private final Semaphore semaphore = new Semaphore(3);
-
-    public void inc() {
-        carCount.incrementAndGet();
-    }
-
-    public void acquire() throws InterruptedException {
-        semaphore.acquire();
-    }
-
-    private synchronized void refresh() {
-        semaphore.release(3);
-    }
+    private final Queue<Car> sharedQueue;
 
     @Override
     public void run() {
         try {
-            while (true) {
-                while (semaphore.availablePermits() != 0) {
-                    sleep(0);
-                }
+            int currentSize = 0;
 
-                synchronized (this) {
-                    notifyAll();
+            while (true) {
+                synchronized (sharedQueue) {
+                    System.out.println("waiting for cars");
+                    while (currentSize < 3) {
+                        sharedQueue.wait();
+
+                        if (!sharedQueue.isEmpty()) {
+                            System.out.print(Objects.requireNonNull(sharedQueue.poll()).getName() + ".. ");
+                            currentSize++;
+                        }
+                    }
+
+                    System.out.println("\nStart ferry");
+                    sleep(600);
+                    System.out.println("Finish ferry\n");
+                    currentSize = 0;
+                    sharedQueue.notifyAll();
                 }
-                System.out.println("\nStart ferry");
-                sleep(600);
-                System.out.println("Finish ferry\n");
-                refresh();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

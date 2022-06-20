@@ -1,15 +1,23 @@
 package org.example;
 
+import java.util.LinkedList;
+
 public class Application {
 
     public static void main(String[] args) {
-        Ferry ferry = new Ferry();
+        LinkedList<Car> sharedQueue = new LinkedList<>();
+        Ferry ferry = new Ferry(sharedQueue);
         ferry.setName("Ferry");
+        ferry.start();
 
         for (int i = 0; i < 500; i++) {
-            new Car(ferry).start();
-        }
+            new Car(sharedQueue).start();
 
-        ferry.start();
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
