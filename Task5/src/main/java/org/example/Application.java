@@ -6,9 +6,10 @@ public class Application {
 
     public static void main(String[] args) {
         LinkedList<Car> sharedQueue = new LinkedList<>();
-        new Ferry(sharedQueue).start();
+        int carsCount = 30;
+        new Ferry(sharedQueue, carsCount).start();
 
-        for (int i = 0; i < 300; i++) {
+        for (int i = 0; i < carsCount; i++) {
             try {
                 Thread.sleep(400);
             } catch (InterruptedException e) {
