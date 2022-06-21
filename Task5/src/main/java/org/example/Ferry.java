@@ -1,14 +1,15 @@
 package org.example;
 
-import lombok.AllArgsConstructor;
-
-import java.util.Objects;
 import java.util.Queue;
 
-@AllArgsConstructor
 public class Ferry extends Thread {
 
     private final Queue<Car> sharedQueue;
+
+    public Ferry(Queue<Car> sharedQueue) {
+        this.sharedQueue = sharedQueue;
+        setName("Ferry");
+    }
 
     @Override
     public void run() {
@@ -18,11 +19,12 @@ public class Ferry extends Thread {
             while (true) {
                 synchronized (sharedQueue) {
                     System.out.println("waiting for cars");
+
                     while (currentSize < 3) {
                         sharedQueue.wait();
 
                         if (!sharedQueue.isEmpty()) {
-                            System.out.print(Objects.requireNonNull(sharedQueue.poll()).getName() + ".. ");
+                            System.out.print(sharedQueue.poll().getName() + ".. ");
                             currentSize++;
                         }
                     }
@@ -31,7 +33,6 @@ public class Ferry extends Thread {
                     sleep(600);
                     System.out.println("Finish ferry\n");
                     currentSize = 0;
-                    sharedQueue.notifyAll();
                 }
             }
         } catch (InterruptedException e) {

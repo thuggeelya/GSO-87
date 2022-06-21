@@ -13,17 +13,9 @@ public class Car extends Thread {
 
     @Override
     public void run() {
-        try {
-            synchronized (sharedQueue) {
-                while (sharedQueue.size() >= 3) {
-                    sharedQueue.wait();
-                }
-
-                sharedQueue.add(this);
-                sharedQueue.notify();
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        synchronized (sharedQueue) {
+            sharedQueue.add(this);
+            sharedQueue.notify();
         }
     }
 }
