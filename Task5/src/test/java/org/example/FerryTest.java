@@ -16,7 +16,7 @@ public class FerryTest {
     @Test
     public void isTripleCapaciousFerry() throws InterruptedException {
         LinkedList<Car> sharedQueue = new LinkedList<>();
-        int carsCount = 30;
+        int carsCount = 300;
         ExecutorService cars = Executors.newFixedThreadPool(carsCount);
         List<Future<?>> compilationList = new ArrayList<>();
         Ferry ferry = new Ferry(sharedQueue, carsCount);
