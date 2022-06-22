@@ -23,7 +23,7 @@ public class MyRunnable implements Runnable {
                     System.out.println(name);
                     NAMES_LIST.add(name);
                     lock.notify();
-                    lock.wait();
+                    lock.wait(1000);
                 }
 
                 iterationCount--;
