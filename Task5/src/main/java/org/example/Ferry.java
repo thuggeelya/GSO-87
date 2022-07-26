@@ -1,55 +1,45 @@
 package org.example;
 
-import lombok.Getter;
-
-import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Ferry extends Thread {
 
     private final Queue<Car> sharedQueue;
-    private final int carsCount;
-    @Getter
-    private final Queue<Car> currentFerry = new LinkedList<>();
-    @Getter
-    private boolean isAlwaysTripleCapacious;
+    public static final AtomicBoolean terminate = new AtomicBoolean(false);
 
-    public Ferry(Queue<Car> sharedQueue, int carsCount) {
+    public Ferry(Queue<Car> sharedQueue) {
         this.sharedQueue = sharedQueue;
-        this.carsCount = carsCount;
         setName("Ferry");
-        isAlwaysTripleCapacious = true;
+    }
+
+    public void stopFerry() {
+        terminate.set(true);
     }
 
     @Override
     public void run() {
         try {
             byte currentSize = 0;
-            byte currentFerryCarsCount;
-            int ferries = 0;
 
-            while (ferries < carsCount / 3) {
+            while (!terminate.get()) {
                 synchronized (sharedQueue) {
                     System.out.println("waiting for cars");
-                    currentFerryCarsCount = 0;
 
                     while (currentSize < 3) {
                         sharedQueue.wait();
 
                         if (!sharedQueue.isEmpty()) {
                             Car car = sharedQueue.poll();
-                            currentFerryCarsCount++;
-                            System.out.print(car.getName() + ".. ");
+                            System.out.println(car.getName());
                             currentSize++;
                         }
                     }
 
-                    isAlwaysTripleCapacious = isAlwaysTripleCapacious && (currentFerryCarsCount == 3);
-                    System.out.println("\nStart ferry");
+                    System.out.println("Start ferry");
                     sleep(600);
                     System.out.println("Finish ferry\n");
                     currentSize = 0;
-                    ferries++;
                 }
             }
         } catch (InterruptedException e) {
