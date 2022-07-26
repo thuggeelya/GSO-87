@@ -1,16 +1,11 @@
 package org.example;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ParkingLot extends Thread {
 
-    @Setter
     private long parkingDelay = 500;
-    @Getter
     private final Boolean[] parkingQueue;
 
     public final AtomicBoolean closed = new AtomicBoolean(false);
@@ -22,6 +17,14 @@ public class ParkingLot extends Thread {
         for (int i = 0; i < capacity; i++) {
             parkingQueue[i] = false;
         }
+    }
+
+    public void setParkingDelay(long parkingDelay) {
+        this.parkingDelay = parkingDelay;
+    }
+
+    public Boolean[] getParkingQueue() {
+        return parkingQueue;
     }
 
     public boolean isOpened() {
