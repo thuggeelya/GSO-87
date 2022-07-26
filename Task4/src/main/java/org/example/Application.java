@@ -1,26 +1,23 @@
 package org.example;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 public class Application {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         int capacity = 5;
-        int carsCount = 17;
-        ExecutorService cars = Executors.newFixedThreadPool(carsCount);
-        ParkingLot parkingLot = new ParkingLot(capacity, carsCount);
+        int carsCount = 16;
+        ParkingLot parkingLot = new ParkingLot(capacity);
         parkingLot.start();
 
         try {
             for (int i = 0; i < carsCount; i++) {
-                cars.submit(new Car(parkingLot));
+                new Car(parkingLot).start();
                 Thread.sleep(500);
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
-        cars.shutdown();
+        Thread.sleep(15_000);
+        parkingLot.setClosed();
     }
 }

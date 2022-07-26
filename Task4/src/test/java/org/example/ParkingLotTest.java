@@ -18,7 +18,7 @@ public class ParkingLotTest {
     private ParkingLot openCloseAndGetParkingLot(int capacity, int carsCount) throws InterruptedException {
         ExecutorService cars = Executors.newFixedThreadPool(carsCount);
         List<Future<?>> compilationList = new ArrayList<>();
-        ParkingLot parkingLot = new ParkingLot(capacity, carsCount);
+        ParkingLot parkingLot = new ParkingLot(capacity);
         parkingLot.setParkingDelay(1);
         parkingLot.start();
 
@@ -26,6 +26,8 @@ public class ParkingLotTest {
             compilationList.add(cars.submit(new Car(parkingLot)));
             Thread.sleep(500);
         }
+
+        parkingLot.setClosed();
 
         while (compilationList.stream().anyMatch(f -> !f.isDone())) {
             Thread.sleep(1);

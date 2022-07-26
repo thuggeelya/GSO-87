@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ParkingLot extends Thread {
 
@@ -11,11 +12,11 @@ public class ParkingLot extends Thread {
     private long parkingDelay = 500;
     @Getter
     private final Boolean[] parkingQueue;
-    private final int carsCount;
 
-    public ParkingLot(int capacity, int carsCount) {
+    public final AtomicBoolean closed = new AtomicBoolean(false);
+
+    public ParkingLot(int capacity) {
         this.parkingQueue = new Boolean[capacity];
-        this.carsCount = carsCount;
         setName("Parking Lot");
 
         for (int i = 0; i < capacity; i++) {
@@ -23,18 +24,23 @@ public class ParkingLot extends Thread {
         }
     }
 
+    public boolean isOpened() {
+        return !closed.get();
+    }
+
+    public void setClosed() {
+        closed.set(true);
+    }
+
     @Override
     public void run() {
-        long workTime = Car.MAX_ATTEMPTS_TO_PARK * carsCount;
-
-        while ((workTime >= 0) || (Arrays.stream(parkingQueue).anyMatch(b -> b))) {
+        while (isOpened()) {
             try {
                 Thread.sleep(parkingDelay);
 
                 synchronized (parkingQueue) {
                     if (Arrays.stream(parkingQueue).anyMatch(b -> !b)) {
                         parkingQueue.notify();
-                        workTime--;
                     }
                 }
             } catch (InterruptedException e) {
@@ -42,7 +48,17 @@ public class ParkingLot extends Thread {
             }
         }
 
-        System.out.println("closing parking lot\n-------------------");
+        System.out.println("\nparking lot is closing .. drive away, please\n-------------------");
+
+        while (Arrays.stream(parkingQueue).anyMatch(b -> b)) {
+            try {
+                sleep(0);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        System.out.println("\nparking lot is closed\n");
     }
 
     public int parkCar(Car car) {

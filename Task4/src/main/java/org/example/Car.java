@@ -2,11 +2,6 @@ package org.example;
 
 public class Car extends Thread {
 
-    /**
-     * Particular car parks at the {@link ParkingLot} the certain value of times and then stops doing it.
-     */
-    public static final long MAX_ATTEMPTS_TO_PARK = 5;
-
     private final Boolean[] parkingQueue;
     private final ParkingLot parkingLot;
 
@@ -24,21 +19,24 @@ public class Car extends Thread {
     public void run() {
         long maxDelay = 8000;
         long minDelay = 2000;
-        long attempts = 0;
         long delay;
         int parkingSpaceNumber;
 
-        while (attempts < MAX_ATTEMPTS_TO_PARK) {
+        while (parkingLot.isOpened()) {
             try {
                 synchronized (parkingQueue) {
-                    parkingQueue.wait();
+                    parkingQueue.wait(maxDelay * parkingQueue.length);
+
+                    if (!parkingLot.isOpened()) {
+                        continue;
+                    }
+
                     parkingSpaceNumber = parkingLot.parkCar(this);
                 }
 
                 delay = (long) (Math.floor(Math.random() * (maxDelay - minDelay)) + minDelay);
                 Thread.sleep(delay);
                 leaveParkingSpaceAfterDelay(parkingSpaceNumber, delay);
-                attempts++;
             } catch (InterruptedException e) {
                 throw new RuntimeException();
             }
