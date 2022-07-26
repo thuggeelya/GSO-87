@@ -1,52 +1,66 @@
 package org.example;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import static org.example.ThreadMessage.MESSAGES_MAP;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
+import static org.example.ThreadCounter.terminate;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class MessagesTest {
 
     @Test
-    public void checkMessagesPerSecond() {
-        String firstMessage = "First message";
-        String secondMessage = "Second message";
-        MessagesContainer containerFor5 = new MessagesContainer();
-        containerFor5.addMessage(firstMessage);
-        MessagesContainer containerFor7 = new MessagesContainer();
-        containerFor7.addMessage(secondMessage);
-        MessagesContainer containerFor5And7 = new MessagesContainer();
-        containerFor5And7.addMessage(firstMessage);
-        containerFor5And7.addMessage(secondMessage);
-        new ThreadCounter(1);
-        new ThreadMessage(5, firstMessage);
-        new ThreadMessage(7, secondMessage);
+    public void checkThreadMessagesPerSecond() throws InterruptedException {
+        String firstMessage = "Message-5";
+        String secondMessage = "Message-7";
+        File file = new File("src/test/resources/task3.txt");
+        List<String> result = new ArrayList<>();
 
-        while (MESSAGES_MAP.size() < 110) {
-            try {
-                //noinspection BusyWait
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+        try (PrintStream printStream = new PrintStream(file)) {
+            new ThreadCounter(1, printStream);
+            new ThreadMessage(5, firstMessage, printStream);
+            new ThreadMessage(7, secondMessage, printStream);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
 
-        System.out.println(MESSAGES_MAP);
+        Thread.sleep(60_000);
+        terminate();
 
-        for (int i = 1; i < 36; i++) {
-            MessagesContainer value = MESSAGES_MAP.get(i);
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
 
-            if (i % 5 == 0) {
-                if (i % 7 == 0) {
-                    assertEquals(containerFor5And7, value);
-                } else {
-                    assertEquals(containerFor5, value);
+            while ((line = br.readLine()) != null) {
+                result.add(line);
+            }
+
+            file.delete();
+        } catch (IOException e) {
+            Logger.getGlobal().severe(e.getMessage());
+        }
+
+        for (int i = 0; i < result.size() - 2; i++) {
+            String line = result.get(i);
+
+            if ((!line.contains("\\D"))) {
+                int nTick = Integer.parseInt(line);
+
+                if (nTick % 35 == 0) {
+                    assertTrue((result.get(i + 1).equals(firstMessage) && result.get(i + 2).equals(secondMessage)) ||
+                            (result.get(i + 1).equals(secondMessage) && result.get(i + 2).equals(firstMessage)));
                 }
-            } else if (i % 7 == 0) {
-                assertEquals(containerFor7, value);
-            } else {
-                assertNull(value);
+
+                if (nTick % 5 == 0) {
+                    assertEquals(result.get(i + 1), firstMessage);
+                }
+
+                if (nTick % 7 == 0) {
+                    assertEquals(result.get(i + 1), secondMessage);
+                }
             }
         }
     }

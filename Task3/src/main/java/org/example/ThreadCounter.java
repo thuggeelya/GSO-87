@@ -1,29 +1,41 @@
 package org.example;
 
+import java.io.PrintStream;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
-public class ThreadCounter implements Runnable {
+public class ThreadCounter extends Thread {
 
-    private final int interval;
+    private final int pauseInSeconds;
+    private final AtomicInteger time = new AtomicInteger(0);
 
-    public ThreadCounter(int interval) {
-        this.interval = interval;
-        Thread thread = new Thread(this);
-        thread.setName("Thread: interval " + interval);
-        thread.start();
+    public static AtomicBoolean terminate = new AtomicBoolean(false);
+    private final PrintStream printStream;
+
+    public ThreadCounter(int pauseInSeconds, PrintStream printStream) {
+        this.pauseInSeconds = pauseInSeconds;
+        setName("Thread-interval-" + pauseInSeconds);
+        this.printStream = printStream;
+    }
+
+    private synchronized int incrementTime() {
+        return time.incrementAndGet();
+    }
+
+    public static void terminate() {
+        terminate.set(true);
     }
 
     @Override
     public void run() {
-        //noinspection InfiniteLoopStatement
-        while (true) {
+        while (!terminate.get()) {
             try {
-                //noinspection BusyWait
-                Thread.sleep(interval * 1000L);
+                Thread.sleep(pauseInSeconds * 1000L);
 
                 // для ежесекундного оповещения потока, воспроизводящего сообщение, потоком, отсчитывающим время
                 synchronized (ThreadMessage.class) {
-                    System.out.println(ThreadMessage.incrementTime());
+                    printStream.println(incrementTime());
                     ThreadMessage.class.notifyAll();
                 }
             } catch (InterruptedException e) {

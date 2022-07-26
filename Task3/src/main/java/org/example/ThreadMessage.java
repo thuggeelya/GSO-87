@@ -1,49 +1,36 @@
 package org.example;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.io.PrintStream;
 import java.util.logging.Logger;
 
-public class ThreadMessage implements Runnable {
+import static org.example.ThreadCounter.terminate;
 
-    private final int interval;
+public class ThreadMessage extends Thread {
+
+    private final int pauseInSeconds;
     private final String message;
-    public static AtomicInteger time = new AtomicInteger(0);
-    public static final Map<Integer, MessagesContainer> MESSAGES_MAP = new ConcurrentHashMap<>();
+    private final PrintStream printStream;
 
-    public ThreadMessage(int interval, String message) {
-        this.interval = interval;
+    public ThreadMessage(int pauseInSeconds, String message, PrintStream printStream) {
+        this.pauseInSeconds = pauseInSeconds;
         this.message = message;
-        Thread thread = new Thread(this);
-        thread.setName("Thread for " + message);
-        thread.start();
-    }
-
-    synchronized static int incrementTime() {
-        return time.incrementAndGet();
+        setName("Thread-" + message);
+        this.printStream = printStream;
     }
 
     @Override
     public void run() {
-        //noinspection InfiniteLoopStatement
-        while (true) {
+        int timeTick = 0;
+
+        while (!terminate.get()) {
             try {
                 synchronized (ThreadMessage.class) {
                     ThreadMessage.class.wait();
-                    int currentTimeTick = time.get();
+                    timeTick++;
 
-                    if (currentTimeTick % interval == 0) {
-                        System.out.println(message);
-                        MessagesContainer currentContainer = MESSAGES_MAP.get(currentTimeTick);
-
-                        if (currentContainer == null) {
-                            MessagesContainer messagesContainer = new MessagesContainer();
-                            currentContainer = MESSAGES_MAP.putIfAbsent(currentTimeTick, messagesContainer);
-                            currentContainer = (currentContainer == null) ? messagesContainer : currentContainer;
-                        }
-
-                        currentContainer.addMessage(message);
+                    if (timeTick == pauseInSeconds) {
+                        printStream.println(message);
+                        timeTick = 0;
                     }
                 }
             } catch (InterruptedException e) {
