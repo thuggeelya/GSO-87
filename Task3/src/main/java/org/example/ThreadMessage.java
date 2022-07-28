@@ -22,7 +22,7 @@ public class ThreadMessage extends Thread {
     public void run() {
         int timeTick = 0;
 
-        while (!terminate.get()) {
+        while (!terminate) {
             try {
                 synchronized (ThreadMessage.class) {
                     ThreadMessage.class.wait();
