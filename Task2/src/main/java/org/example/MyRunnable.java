@@ -1,7 +1,6 @@
 package org.example;
 
 import java.io.PrintStream;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MyRunnable implements Runnable {
@@ -12,7 +11,7 @@ public class MyRunnable implements Runnable {
     private final int number;
     private final int nThreads;
     public static AtomicInteger currentThreadNumber = new AtomicInteger(0);
-    public static AtomicBoolean terminate = new AtomicBoolean(false);
+    public static boolean terminate = false;
 
     public MyRunnable(int number, int nThreads, Object lock, PrintStream printStream) {
         this.name = "Thread-" + number;
@@ -23,13 +22,13 @@ public class MyRunnable implements Runnable {
     }
 
     public static void terminate() {
-        terminate.set(true);
+        terminate = true;
     }
 
     @Override
     public void run() {
         try {
-            while (!terminate.get()) {
+            while (!terminate) {
                 synchronized (lock) {
                     if (currentThreadNumber.get() == number) {
                         printStream.println(name);
