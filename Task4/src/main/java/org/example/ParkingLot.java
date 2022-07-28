@@ -1,14 +1,13 @@
 package org.example;
 
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ParkingLot extends Thread {
 
     private long parkingDelay = 500;
     private final Boolean[] parkingQueue;
 
-    public final AtomicBoolean closed = new AtomicBoolean(false);
+    public boolean closed = false;
 
     public ParkingLot(int capacity) {
         this.parkingQueue = new Boolean[capacity];
@@ -28,11 +27,11 @@ public class ParkingLot extends Thread {
     }
 
     public boolean isOpened() {
-        return !closed.get();
+        return !closed;
     }
 
     public void setClosed() {
-        closed.set(true);
+        closed = true;
     }
 
     @Override
