@@ -1,12 +1,11 @@
 package org.example;
 
 import java.util.Queue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Ferry extends Thread {
 
     private final Queue<Car> sharedQueue;
-    public static final AtomicBoolean terminate = new AtomicBoolean(false);
+    public static boolean terminate = false;
 
     public Ferry(Queue<Car> sharedQueue) {
         this.sharedQueue = sharedQueue;
@@ -14,7 +13,7 @@ public class Ferry extends Thread {
     }
 
     public void stopFerry() {
-        terminate.set(true);
+        terminate = true;
     }
 
     @Override
@@ -22,7 +21,7 @@ public class Ferry extends Thread {
         try {
             byte currentSize = 0;
 
-            while (!terminate.get()) {
+            while (!terminate) {
                 synchronized (sharedQueue) {
                     System.out.println("waiting for cars");
 
