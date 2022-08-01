@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotEquals;
 
 public class MyRunnableTest {
 
-    private static final File file = new File("src/test/resources/task2.txt");
+    private final File file = new File("src/test/resources/task2.txt");
 
     @Test
     public void checkTwoNThreadNamesGoOneByOne() throws InterruptedException {
