@@ -1,24 +1,25 @@
 package org.example;
 
 import java.io.PrintStream;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MyRunnable implements Runnable {
 
     private final String name;
-    private final Object lock;
     private final PrintStream printStream;
     private final int number;
     private final int nThreads;
+    private final Queue<Integer> queue;
     public static AtomicInteger currentThreadNumber = new AtomicInteger(0);
     public static boolean terminate = false;
 
-    public MyRunnable(int number, int nThreads, Object lock, PrintStream printStream) {
+    public MyRunnable(int number, int nThreads, PrintStream printStream, Queue<Integer> queue) {
         this.name = "Thread-" + number;
         this.number = number;
-        this.lock = lock;
         this.printStream = printStream;
         this.nThreads = nThreads;
+        this.queue = queue;
     }
 
     public static void terminate() {
@@ -29,14 +30,21 @@ public class MyRunnable implements Runnable {
     public void run() {
         try {
             while (!terminate) {
-                synchronized (lock) {
-                    if (currentThreadNumber.get() == number) {
-                        printStream.println(name);
-                        currentThreadNumber.set(currentThreadNumber.incrementAndGet() % nThreads);
+                synchronized (queue) {
+                    int el = 0;
+
+                    if (queue.peek() != null) {
+                        el = queue.poll();
                     }
 
-                    lock.notify();
-                    lock.wait(1000);
+                    if (el == number) {
+                        printStream.println(name);
+                        el++;
+                    }
+
+                    queue.add(el % nThreads);
+                    queue.notify();
+                    queue.wait(1000);
                 }
             }
         } catch (InterruptedException e) {
