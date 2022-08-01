@@ -19,7 +19,5 @@ public class Application {
 
             new Car(sharedQueue).start();
         }
-
-        ferry.stopFerry();
     }
 }
