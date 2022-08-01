@@ -2,7 +2,6 @@ package org.example;
 
 import java.io.PrintStream;
 import java.util.Queue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class MyRunnable implements Runnable {
 
@@ -11,7 +10,6 @@ public class MyRunnable implements Runnable {
     private final int number;
     private final int nThreads;
     private final Queue<Integer> queue;
-    public static AtomicInteger currentThreadNumber = new AtomicInteger(0);
     public static boolean terminate = false;
 
     public MyRunnable(int number, int nThreads, PrintStream printStream, Queue<Integer> queue) {
