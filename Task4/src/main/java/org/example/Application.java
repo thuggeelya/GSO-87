@@ -16,8 +16,5 @@ public class Application {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-
-        Thread.sleep(15_000);
-        parkingLot.setClosed();
     }
 }
