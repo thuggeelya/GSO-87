@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import static org.example.ThreadCounter.terminate;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -21,15 +20,15 @@ public class MessagesTest {
         List<String> result = new ArrayList<>();
 
         try (PrintStream printStream = new PrintStream(file)) {
-            new ThreadCounter(1, printStream);
-            new ThreadMessage(5, firstMessage, printStream);
-            new ThreadMessage(7, secondMessage, printStream);
+            ThreadCounter counter = new ThreadCounter(1, printStream);
+            counter.start();
+            new ThreadMessage(5, firstMessage, printStream, counter).start();
+            new ThreadMessage(7, secondMessage, printStream, counter).start();
+            Thread.sleep(20_000);
+            counter.terminate();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
-        Thread.sleep(60_000);
-        terminate();
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
@@ -46,7 +45,7 @@ public class MessagesTest {
         for (int i = 0; i < result.size() - 2; i++) {
             String line = result.get(i);
 
-            if ((!line.contains("\\D"))) {
+            if ((line.matches("^\\d*$"))) {
                 int nTick = Integer.parseInt(line);
 
                 if (nTick % 35 == 0) {

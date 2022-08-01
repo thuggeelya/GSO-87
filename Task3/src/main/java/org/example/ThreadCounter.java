@@ -9,7 +9,7 @@ public class ThreadCounter extends Thread {
     private final int pauseInSeconds;
     private final AtomicInteger time = new AtomicInteger(0);
 
-    public static boolean terminate = false;
+    private boolean terminate = false;
     private final PrintStream printStream;
 
     public ThreadCounter(int pauseInSeconds, PrintStream printStream) {
@@ -18,12 +18,12 @@ public class ThreadCounter extends Thread {
         this.printStream = printStream;
     }
 
-    private synchronized int incrementTime() {
-        return time.incrementAndGet();
+    public void terminate() {
+        terminate = true;
     }
 
-    public static void terminate() {
-        terminate = true;
+    public boolean isTerminate() {
+        return terminate;
     }
 
     @Override
@@ -34,11 +34,11 @@ public class ThreadCounter extends Thread {
 
                 // для ежесекундного оповещения потока, воспроизводящего сообщение, потоком, отсчитывающим время
                 synchronized (ThreadMessage.class) {
-                    printStream.println(incrementTime());
+                    printStream.println(time.incrementAndGet());
                     ThreadMessage.class.notifyAll();
                 }
             } catch (InterruptedException e) {
-                Logger.getGlobal().severe("Thread was interrupted: " + e);
+                Logger.getGlobal().severe("Thread was interrupted: " + getName() + System.lineSeparator() + e);
             }
         }
     }
