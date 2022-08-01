@@ -8,7 +8,7 @@ public class MyRunnable implements Runnable {
     private final String name;
     private final PrintStream printStream;
     private final Queue<MyRunnable> queue;
-    public boolean terminate = false;
+    private boolean terminate = false;
 
     public MyRunnable(int number, PrintStream printStream, Queue<MyRunnable> queue) {
         this.name = "Thread-" + number;
