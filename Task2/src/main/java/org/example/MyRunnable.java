@@ -6,22 +6,25 @@ import java.util.Queue;
 public class MyRunnable implements Runnable {
 
     private final String name;
-    private final PrintStream printStream;
     private final int number;
-    private final int nThreads;
-    private final Queue<Integer> queue;
+    private final PrintStream printStream;
+    private final Queue<MyRunnable> queue;
     public static boolean terminate = false;
 
-    public MyRunnable(int number, int nThreads, PrintStream printStream, Queue<Integer> queue) {
+    public MyRunnable(int number, PrintStream printStream, Queue<MyRunnable> queue) {
         this.name = "Thread-" + number;
         this.number = number;
         this.printStream = printStream;
-        this.nThreads = nThreads;
         this.queue = queue;
+        queue.add(this);
     }
 
     public static void terminate() {
         terminate = true;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -29,18 +32,11 @@ public class MyRunnable implements Runnable {
         try {
             while (!terminate) {
                 synchronized (queue) {
-                    int el = 0;
-
-                    if (queue.peek() != null) {
-                        el = queue.poll();
-                    }
-
-                    if (el == number) {
+                    if ((queue.peek() != null) && (queue.peek().equals(this))) {
                         printStream.println(name);
-                        el++;
+                        queue.add(queue.poll());
                     }
 
-                    queue.add(el % nThreads);
                     queue.notify();
                     queue.wait(1000);
                 }

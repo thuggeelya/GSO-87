@@ -7,8 +7,8 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import static org.example.MyRunnable.terminate;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 public class MyRunnableTest {
 
@@ -16,12 +16,12 @@ public class MyRunnableTest {
 
     @Test
     public void checkTwoNThreadNamesGoOneByOne() throws InterruptedException {
-        Queue<Integer> queue = new LinkedList<>();
+        Queue<MyRunnable> queue = new LinkedList<>();
         List<String> result = new ArrayList<>();
 
         try (PrintStream printStream = new PrintStream(file)) {
-            new Thread(new MyRunnable(0, 2, printStream, queue));
-            new Thread(new MyRunnable(1, 2, printStream, queue));
+            new Thread(new MyRunnable(0, printStream, queue)).start();
+            new Thread(new MyRunnable(1, printStream, queue)).start();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -41,30 +41,30 @@ public class MyRunnableTest {
             Logger.getGlobal().severe(e.getMessage());
         }
 
-        int resultSize = result.size();
-
-        for (int i = 0; i < resultSize - 1; i++) {
-            for (int j = i + 1; j < resultSize; j++) {
-                assertNotEquals(result.get(i), result.get(j));
-            }
+        for (int i = 0; i < result.size() - 1; i++) {
+            assertNotEquals(result.get(i), result.get(i + 1));
         }
     }
 
     @Test
     public void checkRandomNThreadNamesGoOneByOne() throws InterruptedException {
-        int nThreads = new Random().nextInt();
-        Queue<Integer> queue = new LinkedList<>();
+        int nThreads = new Random().nextInt(10) + 3;
+        Queue<MyRunnable> queue = new LinkedList<>();
         List<String> result = new ArrayList<>();
+        List<MyRunnable> myRunnableList = new ArrayList<>();
 
         try (PrintStream printStream = new PrintStream(file)) {
             for (int i = 0; i < nThreads; i++) {
-                new Thread(new MyRunnable(i, nThreads, printStream, queue));
+                MyRunnable runnable = new MyRunnable(i, printStream, queue);
+                myRunnableList.add(runnable);
             }
+
+            myRunnableList.forEach(r -> new Thread(r).start());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
-        Thread.sleep(5000);
+        Thread.sleep(10000);
         terminate();
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -79,20 +79,17 @@ public class MyRunnableTest {
             Logger.getGlobal().severe(e.getMessage());
         }
 
-        int resultSize = result.size();
-
-        for (int i = 0; i < resultSize - 1; i++) {
-            for (int j = i + 1; j < resultSize; j++) {
-                assertEquals(getNumber(result.get(i)) + 1, getNumber(result.get(j)));
-            }
+        for (int i = 0; i < result.size() - 1; i++) {
+            int iNumber = getNumber(result.get(i));
+            assertTrue((iNumber + 1 == getNumber(result.get(i + 1))) || (iNumber + 1 == nThreads));
         }
     }
 
     private static int getNumber(String threadName) {
-        if (threadName.contains("\\d")) {
+        if (threadName.matches(".*\\d*.*")) {
             return Integer.parseInt(threadName.replaceAll("\\D", ""));
         }
 
-        throw new IllegalArgumentException("Cannot get thread number by its name ..");
+        throw new IllegalArgumentException("Cannot get thread number by its name: " + threadName);
     }
 }
