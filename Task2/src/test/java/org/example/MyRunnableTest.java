@@ -6,7 +6,6 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 
-import static org.example.MyRunnable.terminate;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -18,16 +17,19 @@ public class MyRunnableTest {
     public void checkTwoNThreadNamesGoOneByOne() throws InterruptedException {
         Queue<MyRunnable> queue = new LinkedList<>();
         List<String> result = new ArrayList<>();
+        List<MyRunnable> myRunnableList = new ArrayList<>();
 
         try (PrintStream printStream = new PrintStream(file)) {
-            new Thread(new MyRunnable(0, printStream, queue)).start();
-            new Thread(new MyRunnable(1, printStream, queue)).start();
+            MyRunnable myRunnable0 = new MyRunnable(0, printStream, queue);
+            MyRunnable myRunnable1 = new MyRunnable(1, printStream, queue);
+            myRunnableList.add(myRunnable0);
+            myRunnableList.add(myRunnable1);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
         Thread.sleep(5000);
-        terminate();
+        myRunnableList.forEach(MyRunnable::terminate);
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
@@ -64,8 +66,8 @@ public class MyRunnableTest {
             e.printStackTrace();
         }
 
-        Thread.sleep(10000);
-        terminate();
+        Thread.sleep(5000);
+        myRunnableList.forEach(MyRunnable::terminate);
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
