@@ -6,14 +6,12 @@ import java.util.Queue;
 public class MyRunnable implements Runnable {
 
     private final String name;
-    private final int number;
     private final PrintStream printStream;
     private final Queue<MyRunnable> queue;
     public static boolean terminate = false;
 
     public MyRunnable(int number, PrintStream printStream, Queue<MyRunnable> queue) {
         this.name = "Thread-" + number;
-        this.number = number;
         this.printStream = printStream;
         this.queue = queue;
         queue.add(this);
@@ -21,10 +19,6 @@ public class MyRunnable implements Runnable {
 
     public static void terminate() {
         terminate = true;
-    }
-
-    public String getName() {
-        return name;
     }
 
     @Override
