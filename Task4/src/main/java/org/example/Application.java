@@ -2,7 +2,7 @@ package org.example;
 
 public class Application {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         int capacity = 5;
         int carsCount = 16;
         ParkingLot parkingLot = new ParkingLot(capacity);
