@@ -26,9 +26,13 @@ public class MyRunnable implements Runnable {
         try {
             while (!terminate) {
                 synchronized (queue) {
-                    if ((queue.peek() != null) && (queue.peek().equals(this))) {
-                        printStream.println(name);
-                        queue.add(queue.poll());
+                    MyRunnable runnable = queue.peek();
+
+                    if (runnable != null) {
+                        if (runnable.equals(this)) {
+                            printStream.println(name);
+                            queue.add(queue.poll());
+                        }
                     }
 
                     queue.notify();
