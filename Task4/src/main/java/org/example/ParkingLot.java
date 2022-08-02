@@ -33,11 +33,7 @@ public class ParkingLot {
         closed = true;
     }
 
-    public int parkCar(Car car) {
-        if (car == null) {
-            throw new IllegalArgumentException("Cannot park the null car");
-        }
-
+    public int parkCar() {
         try {
             semaphore.acquire();
         } catch (InterruptedException e) {

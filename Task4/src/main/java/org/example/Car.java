@@ -22,7 +22,7 @@ public class Car extends Thread {
 
         while (parkingLot.isOpened()) {
             try {
-                parkingSpaceNumber = parkingLot.parkCar(this);
+                parkingSpaceNumber = parkingLot.parkCar();
                 System.out.printf("-> %s is parking at space [%d]%n", getName(), parkingSpaceNumber);
                 delay = (long) (Math.floor(Math.random() * (maxDelay - minDelay)) + minDelay);
                 Thread.sleep(delay);
