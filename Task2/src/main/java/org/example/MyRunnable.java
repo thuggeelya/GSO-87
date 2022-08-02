@@ -28,6 +28,7 @@ public class MyRunnable implements Runnable {
                 synchronized (queue) {
                     MyRunnable runnable = queue.peek();
 
+                    // check the head of the queue
                     if (runnable != null) {
                         if (runnable.equals(this)) {
                             printStream.println(name);
@@ -36,11 +37,14 @@ public class MyRunnable implements Runnable {
                     }
 
                     queue.notify();
-                    queue.wait(1000);
+                    queue.wait();
                 }
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        // kick this out if interrupted
+        queue.poll();
     }
 }
