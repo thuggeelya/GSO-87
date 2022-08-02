@@ -1,18 +1,18 @@
 package org.example;
 
 import java.util.LinkedList;
+import java.util.concurrent.CyclicBarrier;
 
 public class Application {
 
     public static void main(String[] args) throws InterruptedException {
         LinkedList<Car> sharedQueue = new LinkedList<>();
-        int carsCount = 30;
-        Ferry ferry = new Ferry(sharedQueue);
-        ferry.start();
+        Ferry ferry = new Ferry(sharedQueue, System.out);
+        CyclicBarrier cyclicBarrier = new CyclicBarrier(3, ferry);
 
-        for (int i = 0; i < carsCount; i++) {
+        while (ferry.isRunning()) {
             Thread.sleep(400);
-            new Car(sharedQueue).start();
+            new Car(sharedQueue, cyclicBarrier).start();
         }
     }
 }

@@ -1,14 +1,17 @@
 package org.example;
 
+import java.io.PrintStream;
 import java.util.Queue;
 
 public class Ferry extends Thread {
 
     private final Queue<Car> sharedQueue;
+    private final PrintStream printStream;
     private boolean terminate = false;
 
-    public Ferry(Queue<Car> sharedQueue) {
+    public Ferry(Queue<Car> sharedQueue, PrintStream printStream) {
         this.sharedQueue = sharedQueue;
+        this.printStream = printStream;
         setName("Ferry");
     }
 
@@ -16,30 +19,29 @@ public class Ferry extends Thread {
         terminate = true;
     }
 
+    public boolean isRunning() {
+        return !terminate;
+    }
+
     @Override
     public void run() {
         try {
-            byte currentSize = 0;
-
             while (!terminate) {
-                System.out.println("waiting for cars");
+                System.out.printf("________________%nWaiting for cars%n");
 
-                synchronized (sharedQueue) {
-                    while (currentSize < 3) {
+                for (int i = 0; i < 3; i++) {
+                    synchronized (sharedQueue) {
                         sharedQueue.wait();
 
-                        if (!sharedQueue.isEmpty()) {
-                            Car car = sharedQueue.poll();
-                            System.out.println(car.getName());
-                            currentSize++;
+                        if (sharedQueue.peek() != null) {
+                            printStream.printf("%d. %s%n", i + 1, sharedQueue.poll().getName());
                         }
                     }
-
-                    System.out.println("Start ferry");
-                    sleep(600);
-                    currentSize = 0;
-                    System.out.println("Finish ferry\n");
                 }
+
+                System.out.println("Start ferry");
+                sleep(600);
+                System.out.printf("Finish ferry%n------------%n");
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
