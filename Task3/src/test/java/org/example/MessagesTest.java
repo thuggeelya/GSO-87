@@ -23,11 +23,18 @@ public class MessagesTest {
 
         try (PrintStream printStream = new PrintStream(file)) {
             ThreadCounter counter = new ThreadCounter(1, printStream);
+            ThreadMessage threadMessage1 = new ThreadMessage(firstMessageInterval, firstMessage, printStream);
+            ThreadMessage threadMessage2 = new ThreadMessage(secondMessageInterval, secondMessage, printStream);
+
             counter.start();
-            new ThreadMessage(firstMessageInterval, firstMessage, printStream, counter).start();
-            new ThreadMessage(secondMessageInterval, secondMessage, printStream, counter).start();
-            Thread.sleep(20_000);
+            threadMessage1.start();
+            threadMessage2.start();
+
+            Thread.sleep(36_000);
+
             counter.terminate();
+            threadMessage1.terminate();
+            threadMessage2.terminate();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -41,26 +48,34 @@ public class MessagesTest {
 
             file.delete();
         } catch (IOException e) {
-            Logger.getGlobal().severe(e.getMessage());
+            Logger.getLogger(getClass().getName()).severe(e.getMessage());
         }
 
+        String line, errorMessage, resultNext, resultAfterNext;
+
         for (int i = 0; i < result.size() - 2; i++) {
-            String line = result.get(i);
+            line = result.get(i);
 
             if ((line.matches("^\\d*$"))) {
                 int nTick = Integer.parseInt(line);
+                errorMessage = nTick + " - error";
+                resultNext = result.get(i + 1);
+                resultAfterNext = result.get(i + 2);
 
                 if (nTick % (firstMessageInterval * secondMessageInterval) == 0) {
-                    assertTrue((result.get(i + 1).equals(firstMessage) && result.get(i + 2).equals(secondMessage)) ||
-                            (result.get(i + 1).equals(secondMessage) && result.get(i + 2).equals(firstMessage)));
-                }
 
-                if (nTick % firstMessageInterval == 0) {
-                    assertEquals(result.get(i + 1), firstMessage);
-                }
+                    assertTrue(errorMessage,
+                            (resultNext.equals(firstMessage) && resultAfterNext.equals(secondMessage)) ||
+                            (resultNext.equals(secondMessage) && resultAfterNext.equals(firstMessage)));
 
-                if (nTick % secondMessageInterval == 0) {
-                    assertEquals(result.get(i + 1), secondMessage);
+                } else if (nTick % firstMessageInterval == 0) {
+
+                    assertEquals(errorMessage, firstMessage, resultNext);
+
+                } else if (nTick % secondMessageInterval == 0) {
+
+                    assertEquals(errorMessage, secondMessage, resultNext);
+
                 }
             }
         }

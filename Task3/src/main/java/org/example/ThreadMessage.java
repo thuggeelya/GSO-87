@@ -3,26 +3,24 @@ package org.example;
 import java.io.PrintStream;
 import java.util.logging.Logger;
 
-public class ThreadMessage extends Thread {
+public class ThreadMessage extends Terminator {
 
     private final int pauseInSeconds;
     private final String message;
     private final PrintStream printStream;
-    private final ThreadCounter counter;
 
-    public ThreadMessage(int pauseInSeconds, String message, PrintStream printStream, ThreadCounter counter) {
+    public ThreadMessage(int pauseInSeconds, String message, PrintStream printStream) {
         this.pauseInSeconds = pauseInSeconds;
         this.message = message;
         setName("Thread-" + message);
         this.printStream = printStream;
-        this.counter = counter;
     }
 
     @Override
     public void run() {
         int timeTick = 0;
 
-        while (!counter.isTerminate()) {
+        while (!super.terminate) {
             try {
                 synchronized (ThreadMessage.class) {
                     ThreadMessage.class.wait();
@@ -34,7 +32,7 @@ public class ThreadMessage extends Thread {
                     }
                 }
             } catch (InterruptedException e) {
-                Logger.getGlobal().severe("Thread was interrupted: " + getName() + System.lineSeparator() + e);
+                Logger.getLogger(getClass().getName()).severe("Thread was interrupted: " + getName() + System.lineSeparator() + e);
             }
         }
     }
