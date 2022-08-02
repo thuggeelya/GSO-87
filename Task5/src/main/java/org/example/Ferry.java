@@ -5,7 +5,7 @@ import java.util.Queue;
 public class Ferry extends Thread {
 
     private final Queue<Car> sharedQueue;
-    public static boolean terminate = false;
+    private boolean terminate = false;
 
     public Ferry(Queue<Car> sharedQueue) {
         this.sharedQueue = sharedQueue;
@@ -22,9 +22,9 @@ public class Ferry extends Thread {
             byte currentSize = 0;
 
             while (!terminate) {
-                synchronized (sharedQueue) {
-                    System.out.println("waiting for cars");
+                System.out.println("waiting for cars");
 
+                synchronized (sharedQueue) {
                     while (currentSize < 3) {
                         sharedQueue.wait();
 
@@ -37,8 +37,8 @@ public class Ferry extends Thread {
 
                     System.out.println("Start ferry");
                     sleep(600);
-                    System.out.println("Finish ferry\n");
                     currentSize = 0;
+                    System.out.println("Finish ferry\n");
                 }
             }
         } catch (InterruptedException e) {
