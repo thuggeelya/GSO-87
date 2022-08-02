@@ -20,7 +20,7 @@ public class ThreadCounter extends Terminator {
     public void run() {
         while (!super.terminate) {
             try {
-                Thread.sleep(pauseInSeconds * 1000L);
+                sleep(pauseInSeconds * 1000L);
 
                 // для ежесекундного оповещения потока, воспроизводящего сообщение, потоком, отсчитывающим время
                 synchronized (ThreadMessage.class) {
