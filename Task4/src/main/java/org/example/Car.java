@@ -27,7 +27,8 @@ public class Car extends Thread {
                 delay = (long) (Math.floor(Math.random() * (maxDelay - minDelay)) + minDelay);
                 Thread.sleep(delay);
                 parkingLot.leaveParkingSpace(parkingSpaceNumber);
-                System.out.printf("<- %s has gone from [%d] after %.3f sec%n", getName(), parkingSpaceNumber, (double) delay / 1000);
+                System.out.printf("<- %s has gone from [%d] after %.3f sec%n",
+                        getName(), parkingSpaceNumber, (double) delay / 1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
