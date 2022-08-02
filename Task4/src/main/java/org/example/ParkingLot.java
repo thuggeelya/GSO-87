@@ -1,25 +1,24 @@
 package org.example;
 
-import java.util.Arrays;
+import java.util.concurrent.Semaphore;
 
-public class ParkingLot extends Thread {
-
-    private long parkingDelay = 500;
+public class ParkingLot {
     private final Boolean[] parkingQueue;
-
-    public boolean closed = false;
+    private boolean closed = false;
+    private final Semaphore semaphore;
 
     public ParkingLot(int capacity) {
-        this.parkingQueue = new Boolean[capacity];
-        setName("Parking Lot");
+        if (capacity == 0) {
+            throw new IllegalArgumentException("Error: empty parking lot");
+        }
+
+        parkingQueue = new Boolean[capacity];
 
         for (int i = 0; i < capacity; i++) {
             parkingQueue[i] = false;
         }
-    }
 
-    public void setParkingDelay(long parkingDelay) {
-        this.parkingDelay = parkingDelay;
+        semaphore = new Semaphore(capacity, true);
     }
 
     public Boolean[] getParkingQueue() {
@@ -34,48 +33,38 @@ public class ParkingLot extends Thread {
         closed = true;
     }
 
-    @Override
-    public void run() {
-        while (isOpened()) {
-            try {
-                Thread.sleep(parkingDelay);
-
-                synchronized (parkingQueue) {
-                    if (Arrays.stream(parkingQueue).anyMatch(b -> !b)) {
-                        parkingQueue.notify();
-                    }
-                }
-            } catch (InterruptedException e) {
-                throw new RuntimeException();
-            }
-        }
-
-        System.out.println("\nparking lot is closing .. drive away, please\n-------------------");
-
-        while (Arrays.stream(parkingQueue).anyMatch(b -> b)) {
-            try {
-                sleep(0);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        System.out.println("\nparking lot is closed\n");
-    }
-
     public int parkCar(Car car) {
         if (car == null) {
             throw new IllegalArgumentException("Cannot park the null car");
         }
 
-        for (int i = 0; i < parkingQueue.length; i++) {
-            if (!parkingQueue[i]) {
-                parkingQueue[i] = true;
-                System.out.println("-> " + car.getName() + " is parking at space " + i);
-                return i;
+        try {
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        synchronized (parkingQueue) {
+            for (int i = 0; i < parkingQueue.length; i++) {
+                if (!parkingQueue[i]) {
+                    parkingQueue[i] = true;
+                    return i;
+                }
             }
         }
 
         throw new RuntimeException("Only one car can take one parking space");
+    }
+
+    public void leaveParkingSpace(int parkingSpaceNumber) {
+        synchronized (parkingQueue) {
+            if (!parkingQueue[parkingSpaceNumber]) {
+                throw new ArrayIndexOutOfBoundsException("Car cannot leave the [" +
+                        parkingSpaceNumber + "] space cause it's already empty");
+            }
+
+            parkingQueue[parkingSpaceNumber] = false;
+            semaphore.release();
+        }
     }
 }

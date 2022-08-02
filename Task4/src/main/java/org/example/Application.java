@@ -4,9 +4,8 @@ public class Application {
 
     public static void main(String[] args) {
         int capacity = 5;
-        int carsCount = 16;
+        int carsCount = Integer.parseInt(args[0]);
         ParkingLot parkingLot = new ParkingLot(capacity);
-        parkingLot.start();
 
         try {
             for (int i = 0; i < carsCount; i++) {
