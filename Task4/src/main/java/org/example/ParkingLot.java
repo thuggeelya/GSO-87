@@ -3,7 +3,7 @@ package org.example;
 import java.util.concurrent.Semaphore;
 
 public class ParkingLot {
-    private final Boolean[] parkingQueue;
+    private final boolean[] parkingQueue;
     private boolean closed = false;
     private final Semaphore semaphore;
 
@@ -12,17 +12,13 @@ public class ParkingLot {
             throw new IllegalArgumentException("Error: empty parking lot");
         }
 
-        parkingQueue = new Boolean[capacity];
+        parkingQueue = new boolean[capacity];
 
         for (int i = 0; i < capacity; i++) {
             parkingQueue[i] = false;
         }
 
         semaphore = new Semaphore(capacity, true);
-    }
-
-    public Boolean[] getParkingQueue() {
-        return parkingQueue;
     }
 
     public boolean isOpened() {
@@ -55,7 +51,7 @@ public class ParkingLot {
     public void leaveParkingSpace(int parkingSpaceNumber) {
         synchronized (parkingQueue) {
             if (!parkingQueue[parkingSpaceNumber]) {
-                throw new ArrayIndexOutOfBoundsException("Car cannot leave the [" +
+                throw new RuntimeException("Car cannot leave the [" +
                         parkingSpaceNumber + "] space cause it's already empty");
             }
 
